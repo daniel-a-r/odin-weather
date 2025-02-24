@@ -1,21 +1,35 @@
-// const options = {
-//   enableHighAccuracy: true
-// };
+const success = (pos) => {
+  const crd = pos.coords;
+  const textInput = document.querySelector('input');
+  textInput.value = `${crd.latitude}, ${crd.longitude}`;
+  getWeather(`${crd.latitude},${crd.longitude}`);
 
-// function success(pos) {
-//   const crd = pos.coords;
+  console.log('Your current position is:');
+  console.log(`Latitude : ${crd.latitude}`);
+  console.log(`Longitude: ${crd.longitude}`);
+  console.log(`More or less ${crd.accuracy} meters.`);
+};
 
-//   console.log("Your current position is:");
-//   console.log(`Latitude : ${crd.latitude}`);
-//   console.log(`Longitude: ${crd.longitude}`);
-//   console.log(`More or less ${crd.accuracy} meters.`);
-// }
+const error = (err) => {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+};
 
-// function error(err) {
-//   console.warn(`ERROR(${err.code}): ${err.message}`);
-// }
+const options = {
+  enableHighAccuracy: true,
+};
 
-// navigator.geolocation.getCurrentPosition(success, error, options);
+const getCurrentPosition = () => {
+  console.log('getting current position');
+  navigator.geolocation.getCurrentPosition(success, error, options);
+};
+
+const addressSubmit = (event) => {
+  event.preventDefault();
+  const formElem = event.currentTarget;
+  const data = new FormData(formElem);
+  console.log(data.get('text'));
+  getWeather(data.get('text'));
+};
 
 const getWeather = async (location) => {
   const baseURL =
@@ -35,4 +49,9 @@ const getWeather = async (location) => {
   console.log({ currentConditions, days, desc, resolvedAddress });
 };
 
-getWeather('queens, ny');
+(() => {
+  const currentPosBtn = document.querySelector('button.current-position');
+  const form = document.querySelector('form');
+  currentPosBtn.addEventListener('click', getCurrentPosition);
+  form.addEventListener('submit', addressSubmit);
+})();
