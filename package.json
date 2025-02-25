@@ -1,14 +1,14 @@
 {
-  "name": "webpack-template",
+  "name": "odin-weather",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://github.com/daniel-a-r/webpack-template#readme",
+  "homepage": "https://github.com/daniel-a-r/odin-weather#readme",
   "bugs": {
-    "url": "https://github.com/daniel-a-r/webpack-template/issues"
+    "url": "https://github.com/daniel-a-r/odin-weather/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daniel-a-r/webpack-template.git"
+    "url": "git+https://github.com/daniel-a-r/odin-weather.git"
   },
   "license": "ISC",
   "author": "",
