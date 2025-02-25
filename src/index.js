@@ -1,14 +1,30 @@
-const getCurrentPosition = () => {
+const currentLocationLoading = () => {
+  const statusDiv = document.querySelector('div.status');
+  statusDiv.textContent = 'Getting current location';
+};
+
+const displayCoords = (coords) => {
+  const statusDiv = document.querySelector('div.status');
+  statusDiv.textContent = `${coords.latitude}, ${coords.longitude}`;
+};
+
+const clearStatus = () => {
+  const statusDiv = document.querySelector('div.status');
+  statusDiv.textContent = '';
+};
+
+const getCurrentPosition = async () => {
   const success = (pos) => {
+    clearStatus();
     const crd = pos.coords;
     const textInput = document.querySelector('input');
     textInput.value = `${crd.latitude}, ${crd.longitude}`;
-    getWeather(`${crd.latitude},${crd.longitude}`);
+    // getWeather(`${crd.latitude},${crd.longitude}`);
 
-    console.log('Your current position is:');
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude: ${crd.longitude}`);
-    console.log(`More or less ${crd.accuracy} meters.`);
+    // console.log('Your current position is:');
+    // console.log(`Latitude : ${crd.latitude}`);
+    // console.log(`Longitude: ${crd.longitude}`);
+    // console.log(`More or less ${crd.accuracy} meters.`);
   };
 
   const error = (err) => {
@@ -19,8 +35,12 @@ const getCurrentPosition = () => {
     enableHighAccuracy: true,
   };
 
-  console.log('getting current position');
+  currentLocationLoading();
   navigator.geolocation.getCurrentPosition(success, error, options);
+  
+  // permissionStatus.addEventListener('change', (e) => {
+  //   console.log(e);
+  // });
 };
 
 const addressSubmit = (event) => {
@@ -60,6 +80,12 @@ const getWeather = async (location) => {
 (() => {
   const currentPosBtn = document.querySelector('button.current-position');
   const form = document.querySelector('form');
+  navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+    console.log(result);
+    result.onchange = (ev) => {
+      console.log(ev);
+    };
+  });
   currentPosBtn.addEventListener('click', getCurrentPosition);
   form.addEventListener('submit', addressSubmit);
 })();
