@@ -31,6 +31,11 @@ const addressSubmit = (event) => {
   getWeather(data.get('text'));
 };
 
+const getIcon = async (iconName) => {
+  const module = await import(`./assets/${iconName}.svg`);
+  return module.default;
+};
+
 const getWeather = async (location) => {
   const baseURL =
     'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
@@ -47,6 +52,9 @@ const getWeather = async (location) => {
   const desc = json.description;
   const resolvedAddress = json.resolvedAddress;
   console.log({ currentConditions, days, desc, resolvedAddress });
+  console.log(currentConditions.icon);
+  const icon = await getIcon(currentConditions.icon);
+  console.log(icon);
 };
 
 (() => {
