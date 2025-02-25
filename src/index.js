@@ -1,24 +1,24 @@
-const success = (pos) => {
-  const crd = pos.coords;
-  const textInput = document.querySelector('input');
-  textInput.value = `${crd.latitude}, ${crd.longitude}`;
-  getWeather(`${crd.latitude},${crd.longitude}`);
-
-  console.log('Your current position is:');
-  console.log(`Latitude : ${crd.latitude}`);
-  console.log(`Longitude: ${crd.longitude}`);
-  console.log(`More or less ${crd.accuracy} meters.`);
-};
-
-const error = (err) => {
-  console.warn(`ERROR(${err.code}): ${err.message}`);
-};
-
-const options = {
-  enableHighAccuracy: true,
-};
-
 const getCurrentPosition = () => {
+  const success = (pos) => {
+    const crd = pos.coords;
+    const textInput = document.querySelector('input');
+    textInput.value = `${crd.latitude}, ${crd.longitude}`;
+    getWeather(`${crd.latitude},${crd.longitude}`);
+  
+    console.log('Your current position is:');
+    console.log(`Latitude : ${crd.latitude}`);
+    console.log(`Longitude: ${crd.longitude}`);
+    console.log(`More or less ${crd.accuracy} meters.`);
+  };
+  
+  const error = (err) => {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+  };
+  
+  const options = {
+    enableHighAccuracy: true,
+  };
+
   console.log('getting current position');
   navigator.geolocation.getCurrentPosition(success, error, options);
 };
@@ -37,7 +37,7 @@ const getWeather = async (location) => {
   // eslint-disable-next-line no-undef
   const apiKey = process.env.VISUALCROSSING_API_KEY;
   const encodedLocation = encodeURIComponent(location);
-  const fullURL = `${baseURL}${encodedLocation}/?key=${apiKey}`;
+  const fullURL = `${baseURL}${encodedLocation}/?iconSet=icons2&key=${apiKey}`;
   console.log(fullURL);
   const response = await fetch(fullURL);
   const json = await response.json();
