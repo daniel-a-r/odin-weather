@@ -1,30 +1,55 @@
-const currentLocationLoading = () => {
-  const statusDiv = document.querySelector('div.status');
-  statusDiv.textContent = 'Getting current location';
+import './style.css';
+
+const displayLoadingCurrentLocation = () => {
+  const infoDiv = document.querySelector('div.info');
+  const para = document.createElement('p');
+  para.textContent = 'Getting coordinates';
+  infoDiv.appendChild(para);
 };
 
-const displayCoords = (coords) => {
-  const statusDiv = document.querySelector('div.status');
-  statusDiv.textContent = `${coords.latitude}, ${coords.longitude}`;
+const displayLoadingWeather = (location) => {
+  const infoDiv = document.querySelector('div.info');
+  const para = document.createElement('p');
+  para.textContent = `Getting weather for ${location}`;
+  infoDiv.appendChild(para);
 };
 
-const clearStatus = () => {
-  const statusDiv = document.querySelector('div.status');
-  statusDiv.textContent = '';
+const getIcon = async (iconName) => {
+  const module = await import(`./assets/${iconName}.svg`);
+  return module.default;
+};
+
+const displayWeather = async (weather) => {
+  console.log(weather);
+  const currentConditions = weather.currentConditions;
+  const conditions = currentConditions.conditions;
+  const days = weather.days;
+  const desc = weather.description;
+  const resolvedAddress = weather.resolvedAddress;
+  console.log({ currentConditions, days, desc, conditions, resolvedAddress });
+  console.log(currentConditions.icon);
+  const icon = await getIcon(currentConditions.icon);
+  console.log(icon);
+};
+
+const clearInfo = () => {
+  const infoDiv = document.querySelector('div.info');
+  while (infoDiv.hasChildNodes()) {
+    infoDiv.removeChild(infoDiv.firstChild);
+  }
 };
 
 const getCurrentPosition = async () => {
   const success = (pos) => {
-    clearStatus();
+    clearInfo();
     const crd = pos.coords;
     const textInput = document.querySelector('input');
     textInput.value = `${crd.latitude}, ${crd.longitude}`;
-    // getWeather(`${crd.latitude},${crd.longitude}`);
-
-    // console.log('Your current position is:');
-    // console.log(`Latitude : ${crd.latitude}`);
-    // console.log(`Longitude: ${crd.longitude}`);
-    // console.log(`More or less ${crd.accuracy} meters.`);
+    console.log('Your current position is:');
+    console.log(`Latitude : ${crd.latitude}`);
+    console.log(`Longitude: ${crd.longitude}`);
+    console.log(`More or less ${crd.accuracy} meters.`);
+    getWeather(`${crd.latitude},${crd.longitude}`);
   };
 
   const error = (err) => {
@@ -35,12 +60,10 @@ const getCurrentPosition = async () => {
     enableHighAccuracy: true,
   };
 
-  currentLocationLoading();
-  navigator.geolocation.getCurrentPosition(success, error, options);
-  
-  // permissionStatus.addEventListener('change', (e) => {
-  //   console.log(e);
-  // });
+  displayLoadingCurrentLocation();
+  setTimeout(() => {
+    navigator.geolocation.getCurrentPosition(success, error, options);
+  }, 1000);
 };
 
 const addressSubmit = (event) => {
@@ -51,41 +74,26 @@ const addressSubmit = (event) => {
   getWeather(data.get('text'));
 };
 
-const getIcon = async (iconName) => {
-  const module = await import(`./assets/${iconName}.svg`);
-  return module.default;
-};
-
 const getWeather = async (location) => {
-  const baseURL =
-    'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
-  // eslint-disable-next-line no-undef
-  const apiKey = process.env.VISUALCROSSING_API_KEY;
-  const encodedLocation = encodeURIComponent(location);
-  const fullURL = `${baseURL}${encodedLocation}/?iconSet=icons2&key=${apiKey}`;
-  console.log(fullURL);
-  const response = await fetch(fullURL);
-  const json = await response.json();
-  console.log(json);
-  const currentConditions = json.currentConditions;
-  const days = json.days;
-  const desc = json.description;
-  const resolvedAddress = json.resolvedAddress;
-  console.log({ currentConditions, days, desc, resolvedAddress });
-  console.log(currentConditions.icon);
-  const icon = await getIcon(currentConditions.icon);
-  console.log(icon);
+  displayLoadingWeather(location);
+  setTimeout(async () => {
+    const baseURL =
+      'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
+    // eslint-disable-next-line no-undef
+    const apiKey = process.env.VISUALCROSSING_API_KEY;
+    const encodedLocation = encodeURIComponent(location);
+    const fullURL = `${baseURL}${encodedLocation}/?iconSet=icons2&key=${apiKey}`;
+    console.log(fullURL);
+    const response = await fetch(fullURL);
+    const json = await response.json();
+    clearInfo();
+    await displayWeather(json);
+  }, 1000);
 };
 
 (() => {
   const currentPosBtn = document.querySelector('button.current-position');
   const form = document.querySelector('form');
-  navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-    console.log(result);
-    result.onchange = (ev) => {
-      console.log(ev);
-    };
-  });
   currentPosBtn.addEventListener('click', getCurrentPosition);
   form.addEventListener('submit', addressSubmit);
 })();
